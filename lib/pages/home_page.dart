@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:pertemuan10_2306003/pages/product_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'login_page.dart';
+import '../models/product_models.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,10 +14,28 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String username = '';
 
+  //variabel utama dari daftar product
+  List<ProductModel> products = [];
+  int totalProduct = 0;
+
   @override
   void initState() {
     super.initState();
     getUser();
+    loadProducts();
+  }
+
+  //method untuk menampilkan data product
+  Future<void> loadProducts() async {
+    final res = await SharedPreferences.getInstance();
+    List<String> productsList = res.getStringList('products') ?? [];
+    totalProduct = productsList.length;
+    setState(() {
+      products = productsList.reversed
+          .take(3)
+          .map((item) => ProductModel.fromJson(item))
+          .toList();
+    });
   }
 
   Future<void> getUser() async {
@@ -42,85 +62,114 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20),
-          child: Container(
-            height: 100,
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
+          child: Column(
+            children: [
+              Container(
+                height: 100,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 15,
+                  vertical: 12,
                 ),
-              ],
-            ),
-            child: Row(
-              children: [
-                const CircleAvatar(
-                  radius: 28,
-                  backgroundImage: NetworkImage(
-                    "https://picsum.photos/id/64/4326/2884",
-                  ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 15),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Hai, Selamat Datang!",
-                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                child: Row(
+                  children: [
+                    const CircleAvatar(
+                      radius: 28,
+                      backgroundImage: NetworkImage(
+                        "https://picsum.photos/id/64/4326/2884",
                       ),
-                      const SizedBox(height: 5),
-                      Row(
+                    ),
+                    const SizedBox(width: 15),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            username,
-                            style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
+                            "Hai, Selamat Datang!",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
                             ),
                           ),
-                          const SizedBox(width: 6),
-                          const Icon(
-                            Icons.verified,
-                            color: Colors.green,
-                            size: 20,
+                          const SizedBox(height: 5),
+                          Row(
+                            children: [
+                              Text(
+                                username,
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              const Icon(
+                                Icons.verified,
+                                color: Colors.green,
+                                size: 20,
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                ),
-                GestureDetector(
-                  onTap: logout,
-                  child: Stack(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(15),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.08),
-                              blurRadius: 8,
+                    ),
+                    GestureDetector(
+                      onTap: logout,
+                      child: Stack(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.08),
+                                  blurRadius: 8,
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.logout,
-                          size: 28,
-                          color: Colors.red,
-                        ),
+                            child: const Icon(
+                              Icons.logout,
+                              size: 28,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+
+              Row(
+                mainAxisAlignment: .spaceBetween,
+                children: [
+                  Text("Total Produk: ${totalProduct.toString()}"),
+                  //tombol ke halaman daftar produk
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: ((context) => const ProductPage()),
+                        ),
+                      );
+                    },
+                    child: Text("Lihat Selengkapnya"),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),
