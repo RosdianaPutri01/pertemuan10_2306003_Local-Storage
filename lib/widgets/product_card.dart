@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pertemuan10_2306003/models/product_models.dart';
+import 'dart:convert';
 
 class ProductCard extends StatelessWidget {
   final ProductModel product;
@@ -29,12 +30,19 @@ class ProductCard extends StatelessWidget {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           subtitle: Column(
-            crossAxisAlignment: .start,
-            spacing: 5,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 5),
+              const SizedBox(height: 5),
               Text("Rp ${product.price}"),
-              Text(product.description),
+              const SizedBox(height: 5),
+              product.image.isNotEmpty
+                  ? Image.memory(
+                      base64Decode(product.image),
+                      width: 120,
+                      height: 130,
+                      fit: BoxFit.cover,
+                    )
+                  : const Icon(Icons.image, size: 120, color: Colors.grey),
             ],
           ),
           leading: onEdit != null
